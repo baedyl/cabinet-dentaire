@@ -54,7 +54,8 @@
         :acte="acte"
         />
       </table>
-      <router-link :to="{ name: 'add-acte', query: { id: { 'idConsultation': this.$data.idConsultation } } }">New Acte</router-link>
+      <router-link :to="{ name: 'add-acte', params: { id: this.$data.idConsultation } }">New Acte</router-link>
+      <!--<router-link :to="{ name: 'add-acte', query: { id: { 'idConsultation': this.$data.idConsultation } } }">New Acte</router-link>-->
     </fieldset>
   </div>
 </template>

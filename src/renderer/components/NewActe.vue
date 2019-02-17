@@ -33,7 +33,7 @@
       <input type="submit" name="" :value="title" v-on:click="newActe">
 
       <!-- Illustration des dents -->
-      <Machoire></Machoire>
+      <Machoire/>
     </form>
   </div>
 </template>
@@ -67,7 +67,7 @@
           dent: '',
           etatActe: 'Started'
         },
-        idConsultation: Number(this.$route.query.id.idConsultation),
+        idConsultation: Number(this.$route.params.id),
         title: 'Ajout Acte'
       }
     },
