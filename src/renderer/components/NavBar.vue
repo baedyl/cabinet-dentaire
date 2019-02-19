@@ -28,6 +28,16 @@
             id: 2,
             text: 'Liste Patients',
             page: '/patients/liste'
+          },
+          {
+            id: 3,
+            text: 'Ajouter RDV',
+            page: '/rdv/add'
+          },
+          {
+            id: 4,
+            text: 'Liste RDV',
+            page: '/rdv/liste'
           }
         ]
       }

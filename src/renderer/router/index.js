@@ -50,6 +50,16 @@ export default new Router({
       component: require('@/components/NewActe').default
     },
     {
+      path: '/rdv/add',
+      name: 'add-rdv',
+      component: require('@/components/NewRdv').default
+    },
+    {
+      path: '/rdv/liste',
+      name: 'liste-rdv',
+      component: require('@/components/ListeRdv').default
+    },
+    {
       path: '*',
       redirect: '/'
     }

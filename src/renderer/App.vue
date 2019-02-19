@@ -18,4 +18,6 @@
 
 <style>
   /* CSS */
+  /* fullCalendar css */
+  @import './assets/fullcalendar.css'
 </style>
