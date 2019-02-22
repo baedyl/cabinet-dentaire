@@ -10,7 +10,7 @@
     <td>{{ patient.telephonePatient }}</td>
     <td>{{ patient.dateNaissance }}</td>
     <td>
-      <button v-on:click="deletePatient">Delete</button>
+      <button class="btn" v-on:click="deletePatient">Delete</button>
     </td>
   </tr>
 </template>

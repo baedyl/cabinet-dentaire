@@ -30,9 +30,11 @@
       </div>
       <div class="error" v-if="!$v.form.emailValue.required">Le champ Email est obligatoire!</div>
       <div class="error" v-if="!$v.form.emailValue.email">Email non valide!</div>
+      <br>
 
       <button v-on:click="editPatient" class="btn">{{ title }}</button>
     </form>
+    <br>
     <fieldset>
       <legend>Consultations Patient</legend>
       {{ getConsultations }}
@@ -50,7 +52,10 @@
         :consultation="consultation"
         />
       </table>
-      <router-link :to="{ name: 'add-consultation', query: { infos: { 'idPatient': this.$data.form.id } } }">New Consultation</router-link>
+      <br>
+      <button class="btn">
+        <router-link :to="{ name: 'add-consultation', query: { infos: { 'idPatient': this.$data.form.id } } }">New Consultation</router-link>
+      </button>
     </fieldset>
   </div>
 </template>

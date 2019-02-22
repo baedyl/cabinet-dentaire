@@ -9,7 +9,7 @@
     <td>{{ acte.dentActe }}</td>
     <td>{{ acte.etatActe }}</td>
     <td>
-      <button v-on:click="deleteActe">Delete</button>
+      <button class="btn" v-on:click="deleteActe">Delete</button>
     </td>
   </tr>
 </template>

@@ -54,7 +54,6 @@
             schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
             header: {
               left: 'prev, next, today',
-              center: 'title',
               right: 'agendaWeek, agendaDay'
             },
             events: globalEvents,

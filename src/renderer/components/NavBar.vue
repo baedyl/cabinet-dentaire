@@ -36,7 +36,7 @@
           },
           {
             id: 4,
-            text: 'Liste RDV',
+            text: 'Agenda',
             page: '/rdv/liste'
           }
         ]

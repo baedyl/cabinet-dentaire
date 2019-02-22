@@ -11,7 +11,7 @@
       <td>{{ consultation.nomDocteur }}</td>
     </router-link>
     <td>
-      <button v-on:click="deleteConsultation">Delete</button>
+      <button class="btn" v-on:click="deleteConsultation">Delete</button>
     </td>
   </tr>
 </template>

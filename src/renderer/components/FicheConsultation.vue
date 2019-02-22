@@ -35,7 +35,7 @@
 
       <button v-on:click="editConsultation" class="btn">{{ title }}</button>
     </form>
-
+    <br>
     <fieldset>
       <legend>Actes</legend>
       {{ getActes }}
@@ -54,7 +54,10 @@
         :acte="acte"
         />
       </table>
+      <br>
+      <button class="btn">
       <router-link :to="{ name: 'add-acte', params: { id: this.$data.idConsultation } }">New Acte</router-link>
+      </button>
       <!--<router-link :to="{ name: 'add-acte', query: { id: { 'idConsultation': this.$data.idConsultation } } }">New Acte</router-link>-->
     </fieldset>
   </div>

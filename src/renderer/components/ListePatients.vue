@@ -1,30 +1,77 @@
 <template>
   <div class="content">
-    {{ getPatients }}
+    <div v-if="dataIsNotHere">
+      {{ getPatientsData() }}
+    </div>
+    <div>{{ filteredAndSortedData }}</div>
+    <form id="search">
+      Search <input name="query" v-model="searchQuery" placeholder="Rechercher un patient">
+    </form>
     <table>
-      <tr>
-        <th>IdPatient</th>
-        <th>NomPatient</th>
-        <th>PrenomPatient</th>
-        <th>MailPatient</th>
-        <th>TelephonePatient</th>
-        <th>DateNaissance</th>
-        <th>Action</th>
-      </tr>
-      <PatientRow v-for="patient in patients"
-      :key="patient.idPatient"
-      :patient="patient"
-      />
+      <thead>
+        <tr>
+          <!--
+          <th v-for="column in columns">
+            <a href="#" v-on:click="sortBy(column)" :class="{active: sortKey == column}">
+              {{ column | capitalize }}
+            </a>
+          </th>
+
+          <th>IdPatient</th>
+          <th>
+            <a href="#" v-on="click: sortBy(nomPatient)" v-class="active: sortKey == nomPatient">
+              NomPatient
+            </a>
+          </th>
+          -->
+          <th>idPatient</th>
+          <th>nomPatient</th>
+          <th>PrenomPatient</th>
+          <th>MailPatient</th>
+          <th>TelephonePatient</th>
+          <th>DateNaissance</th>
+          <th>Action</th>
+
+        </tr>
+      </thead>
+      <tbody>
+        <!--<tr>
+          <router-link :to="{ name: 'fiche-patient', query: { infos: { 'id': patient.idPatient }}}">
+            <td>{{ patient.idPatient }}</td>
+          </router-link>
+          <td>{{ patient.nomPatient }}</td>
+          <td>{{ patient.prenomPatient }}</td>
+          <td>{{ patient.mailPatient }}</td>
+          <td>{{ patient.telephonePatient }}</td>
+          <td>{{ patient.dateNaissance }}</td>
+        </tr>
+        -->
+        <PatientRow v-for="patient in filteredPatients"
+        :key="patient.idPatient"
+        :patient="patient"
+        />
+
+      </tbody>
     </table>
+
+    <!--<GridTemplate
+      :heroes="gridData"
+      :columns="gridColumns"
+      :filterKey="searchQuery">
+    </GridTemplate>
+  -->
+
+
   </div>
 </template>
 
 <script>
-  // Needs some memory improvements
+  // For some memory improvements
   // Not read the DB each time...
   // Call the method only once, and use
   // the stored array for the next requests.
   import PatientRow from './PatientRow.vue'
+  // import GridTemplate from './GridTemplate.vue'
 
   const db = require('../database.js')
   const conn = db.getPool()
@@ -36,27 +83,74 @@
     },
     data () {
       return {
-        patients: []
+        patients: [],
+        filteredPatients: [],
+        sortAsc: true,
+        searchQuery: '',
+        dataIsNotHere: true
       }
     },
     computed: {
       getPatients: function () {
+        console.log('length: ' + this.patients.length)
+
         if (this.patients.length === 0) {
           console.log('Reading the Database...')
-          conn.query('SELECT * FROM Patient', (err, patients, fields) => {
+          conn.query('SELECT * FROM Patient', (err, results, fields) => {
             if (err) throw err
-            // Vue.set(patients, Array(results))
-            console.log('Patients SQL : ', patients)
-            for (var p of patients) {
-              console.log('Patient : ', p)
-              this.patients.push(p)
+            // console.log('Patients SQL : ', patients)
+            for (var p of results) {
+              // console.log('Patient : ', p)
+              console.log('in! ' + this.patients.includes(p))
+              if (this.patients.includes(p) === false) {
+                this.patients.push(p)
+              }
             }
-            // this.patients = Array(results)
           })
         }
+      },
+      // Search the nomPatient and prenomPatient
+      filteredAndSortedData: function () {
+        let result = this.patients
+        this.searchQuery = this.searchQuery.toLowerCase()
+        if (this.searchQuery) {
+          let halfSorted = result.filter(item => item.nomPatient.toLowerCase().includes(this.searchQuery))
+          // Copy both results arrays and remove duplicates
+          result = [...new Set([...halfSorted, ...result.filter(item => item.prenomPatient.toLowerCase().includes(this.searchQuery))])]
+        }
+
+        let ascDesc = this.sortAsc ? 1 : -1
+        this.filteredPatients = result.sort((a, b) => ascDesc * a.nomPatient.localeCompare(b.nomPatient))
+        // return this.filteredPatients
       }
     },
     methods: {
+      sortBy: function (sortKey) {
+        this.reverse = (this.sortKey === sortKey) ? !this.reverse : false
+        this.sortKey = sortKey
+      },
+      getPatientsData: function () {
+        console.log('Reading the Database...')
+        conn.query('SELECT * FROM Patient', (err, results, fields) => {
+          if (err) throw err
+          // console.log('Patients SQL : ', patients)
+          for (var p of results) {
+            // console.log('Patient : ', p)
+            console.log('in! ' + this.patients.includes(p))
+            if (this.patients.includes(p) === false) {
+              this.patients.push(p)
+            }
+          }
+        })
+        this.dataIsNotHere = false
+      }
+    },
+    filters: {
+      capitalize: function (value) {
+        if (!value) return ''
+        value = value.toString()
+        return value.charAt(0).toUpperCase() + value.slice(1)
+      }
     }
   }
 </script>
