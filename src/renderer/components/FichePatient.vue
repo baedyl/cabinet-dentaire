@@ -4,6 +4,19 @@
     <h2>
       ID Patient: {{ $route.query.infos.id }}
       {{ getPatientData }}
+      <button class="btn" id="show-modal" @click="showModal = true">Observation</button>
+      <!-- use the modal component, pass in the prop -->
+      <Modal v-if="showModal" @close="showModal = false">
+        <!--
+          you can use custom content here to overwrite
+          default content
+        -->
+          <div>
+            <!-- Illustration des dents -->
+            <Machoire class="modal-container" />
+          </div>
+        <h3 slot="header">Hello Test</h3>
+      </Modal>
     </h2>
     <form>
       <div class="form-group" :class="{ 'form-group--error': $v.form.firstName.$error }">
@@ -66,13 +79,15 @@
   import numeric from 'vuelidate/lib/validators/numeric'
 
   import ConsultationRow from './ConsultationRow'
+  import Modal from './Modal.vue'
 
   const db = require('../database.js')
   const conn = db.getPool()
 
   export default {
     components: {
-      ConsultationRow
+      ConsultationRow,
+      Modal
     },
     data () {
       return {
@@ -88,7 +103,8 @@
         },
         title: 'Enregistrer Modifications',
         consultations: [],
-        dataIsHere: false
+        dataIsHere: false,
+        showModal: false
       }
     },
     props: [
@@ -165,23 +181,6 @@
   padding-left: 20px;
   }
 
-  .btn {
-    font-size: .8em;
-    cursor: pointer;
-    outline: none;
-    padding: 0.75em 2em;
-    border-radius: 2em;
-    display: inline-block;
-    color: #fff;
-    background-color: #4fc08d;
-    transition: all 0.15s ease;
-    box-sizing: border-box;
-    border: 1px solid #4fc08d;
-
-    color: #42b983;
-    background-color: transparent;
-  }
-
   fieldset
   {
     background-color:#CCC;
@@ -191,5 +190,68 @@
   {
     margin-bottom:0px;
     margin-left:16px;
+  }
+  .modal-mask {
+    position: fixed;
+    z-index: 9998;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, .5);
+    display: table;
+    transition: opacity .3s ease;
+  }
+
+  .modal-wrapper {
+    display: table-cell;
+    vertical-align: middle;
+  }
+
+  .modal-container {
+    width: 330px;
+    margin: 0px auto;
+    padding: 20px 30px;
+    background-color: #fff;
+    border-radius: 2px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
+    transition: all .3s ease;
+    font-family: Helvetica, Arial, sans-serif;
+  }
+
+  .modal-header h3 {
+    margin-top: 410px;
+    color: #42b983;
+  }
+
+  .modal-body {
+    margin: 100px 0;
+  }
+
+  .modal-default-button {
+    float: right;
+  }
+
+  /*
+   * The following styles are auto-applied to elements with
+   * transition="modal" when their visibility is toggled
+   * by Vue.js.
+   *
+   * You can easily play with the modal transition by editing
+   * these styles.
+   */
+
+  .modal-enter {
+    opacity: 0;
+  }
+
+  .modal-leave-active {
+    opacity: 0;
+  }
+
+  .modal-enter .modal-container,
+  .modal-leave-active .modal-container {
+    -webkit-transform: scale(1.1);
+    transform: scale(1.1);
   }
 </style>

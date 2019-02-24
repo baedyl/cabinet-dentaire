@@ -3,10 +3,10 @@
     <!--<router-link :to="{ name: 'fiche-patient', query: { infos: { 'id': form.idPatient }}}">Retour</router-link>-->
     <form>
       <div class="form-group" :class="{ 'form-group--error': $v.form.dateRdv.$error }">
-        <label class="form__label">Date Rdv</label>
-        <input class="form__input" v-model.trim="$v.form.dateRdv.$model" type="datetime-local"/>
+        <label class="form__label">Date et Heure Rdv</label>
+        <input class="form__input" v-model.trim="$v.form.dateRdv.$model" type="datetime-local" @change="verifyDate"/>
       </div>
-      <div class="error" v-if="!$v.form.dateRdv.required">Le champ date est obligatoire!</div>
+      <div class="error" v-if="!$v.form.dateRdv.required">Le champ date et heure est obligatoire!</div>
 
       <div class="form-group">
         <label class="form__label">Patient</label>
@@ -20,7 +20,7 @@
 
       <div class="form-group">
         <label class="form__label">Medecin traitant</label>
-        <select v-model="$data.form.medecin" @change="onChange">
+        <select v-model="$data.form.medecin" @change="onChangeDocteur">
           {{ getIdDocteurs }}
           <option v-for="doc in docteurs" :value="doc.id">
             {{ doc.nomComplet }}
@@ -34,6 +34,10 @@
       </div>
 
       <button type="submit" class="btn" v-on:click="newRdv">{{ title }}</button>
+      <div v-if="envoyerMail">
+        {{sendMail()}}
+      </div>
+      <!--<button class="btn" v-on:click="sendMail">Send Mail</button>-->
     </form>
   </div>
 
@@ -42,9 +46,12 @@
 <script>
   import required from 'vuelidate/lib/validators/required'
   // import numeric from 'vuelidate/lib/validators/numeric'
+  import * as emailjs from 'emailjs-com'
 
   const db = require('../database.js')
   const conn = db.getPool()
+
+  var mailPatient = ''
 
   export default {
     name: 'add-patient',
@@ -52,6 +59,7 @@
     },
     data () {
       return {
+        envoyerMail: false,
         docteurs: [],
         patients: [],
         form: {
@@ -110,7 +118,8 @@
                 'id': pat.idPatient,
                 'nomPatient': pat.nomPatient,
                 'prenomPatient': pat.prenomPatient,
-                'nomComplet': pat.nomPatient + ' ' + pat.prenomPatient
+                'nomComplet': pat.nomPatient + ' ' + pat.prenomPatient,
+                'mailPatient': pat.mailPatient
               }
               this.$data.patients.push(patient)
             }
@@ -125,10 +134,50 @@
           (err, results, fields) => {
             if (err) throw err
             console.log('New Rdv : ', results)
+            this.$data.envoyerMail = true
           })
       },
       onChange: function (event) {
-        console.log(event.target.value)
+        // console.log(event.target.value)
+        let idP = Number(event.target.value)
+        mailPatient = this.$data.patients.find(x => x.id === idP).mailPatient
+        console.log('mailPatient: ' + mailPatient)
+      },
+      onChangeDocteur: function (event) {
+        // Verifier si un Rdv n'existe pas pour le meme jour et heure
+        // pour le docteur selectionne
+        let idDoc = Number(event.target.value)
+        console.log('Verifying Date... ' + idDoc)
+        console.log('Reading the Database...')
+        conn.query('SELECT * FROM Rdv WHERE dateRdv = ? AND Docteur_idDocteur = ?', [this.$data.form.dateRdv, idDoc], (err, results, fields) => {
+          if (err) throw err
+          // console.log('Patients SQL : ', patients)
+          if (results.length > 0) {
+            alert('Jour et heure de Rdv non disponible')
+            this.$data.form.dateRdv = ''
+          }
+        })
+      },
+      verifyDate: function () {
+
+      },
+      sendMail: function () {
+        emailjs.init('user_awm2wX3M7EMMitXz238N3')
+        var templateParams = {
+          mail_patient: mailPatient,
+          contact_number: Math.random() * 100000 | 0,
+          nom_patient: this.$data.patients[Number(this.$data.form.patient) - 1].nomComplet,
+          nom_docteur: this.$data.docteurs[Number(this.$data.form.medecin) - 1].nomComplet,
+          date_rdv: this.$data.form.dateRdv,
+          note: this.$data.form.note
+        }
+
+        emailjs.send('contact_service', 'new_rdv', templateParams)
+          .then((response) => {
+            console.log('SUCCESS!', response.status, response.text)
+          }, (err) => {
+            console.log('FAILED...', err)
+          })
       }
     },
     validations: {

@@ -10,20 +10,6 @@
     <table>
       <thead>
         <tr>
-          <!--
-          <th v-for="column in columns">
-            <a href="#" v-on:click="sortBy(column)" :class="{active: sortKey == column}">
-              {{ column | capitalize }}
-            </a>
-          </th>
-
-          <th>IdPatient</th>
-          <th>
-            <a href="#" v-on="click: sortBy(nomPatient)" v-class="active: sortKey == nomPatient">
-              NomPatient
-            </a>
-          </th>
-          -->
           <th>idPatient</th>
           <th>nomPatient</th>
           <th>PrenomPatient</th>
@@ -35,22 +21,10 @@
         </tr>
       </thead>
       <tbody>
-        <!--<tr>
-          <router-link :to="{ name: 'fiche-patient', query: { infos: { 'id': patient.idPatient }}}">
-            <td>{{ patient.idPatient }}</td>
-          </router-link>
-          <td>{{ patient.nomPatient }}</td>
-          <td>{{ patient.prenomPatient }}</td>
-          <td>{{ patient.mailPatient }}</td>
-          <td>{{ patient.telephonePatient }}</td>
-          <td>{{ patient.dateNaissance }}</td>
-        </tr>
-        -->
         <PatientRow v-for="patient in filteredPatients"
         :key="patient.idPatient"
         :patient="patient"
         />
-
       </tbody>
     </table>
 
