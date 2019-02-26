@@ -1,6 +1,11 @@
 <template>
   <div class="content">
-    <router-link :to="{ name: 'fiche-patient', query: { infos: { 'id': form.idPatient }}}">Retour</router-link>
+    <router-link :to="{ name: 'fiche-patient', query: { infos: { 'id': form.idPatient }}}">
+      <img class="left-arrow" src="../assets/back.png"/>
+    </router-link>
+    <br>
+    <br>
+    <br>
     <h2>ID Consultation: {{ idConsultation }}</h2>
     {{ getConsultationData }}
     <form>
@@ -33,7 +38,7 @@
         <input class="form__input" v-model="$data.form.note"/>
       </div>
 
-      <button v-on:click="editConsultation" class="btn">{{ title }}</button>
+      <h2><button v-on:click="editConsultation" class="btn">{{ title }}</button></h2>
     </form>
     <br>
     <fieldset>
@@ -56,9 +61,33 @@
       </table>
       <br>
       <button class="btn">
-      <router-link :to="{ name: 'add-acte', params: { id: this.$data.idConsultation } }">New Acte</router-link>
+      <h2><router-link :to="{ name: 'add-acte', params: { id: this.$data.idConsultation } }">New Acte</router-link></h2>
       </button>
       <!--<router-link :to="{ name: 'add-acte', query: { id: { 'idConsultation': this.$data.idConsultation } } }">New Acte</router-link>-->
+    </fieldset>
+    <fieldset v-if="addOrdonnance">
+      <legend>Ordonnance</legend>
+      <label class="form__label">Note Ordonnance</label>
+      <input class="form__input" v-model="$data.form.noteOrdonnance"/>
+
+      <div class="form-group">
+        <label class="switch" for="hasExtra">Another One?
+          <input type="checkbox" id="hasExtra" v-model="hasExtra">
+          <span class="slider round"></span>
+        </label>
+        <!--<div class="toggle">
+          <input id="hasExtra" type="checkbox" v-model="hasExtra"/>
+          <label for="hasExtra">
+            <div class="toggle__switch"></div>
+          </label>
+        </div>-->
+      </div>
+      <div class="form-group" v-if="hasExtra">
+        <label class="form__label">Extra</label>
+        <textarea class="form__input" v-model="extra"/>
+      </div>
+      <br>
+      <h2><button class="btn" v-on:click="newOrdonnance">Ajouter</button></h2>
     </fieldset>
   </div>
 </template>
@@ -66,6 +95,7 @@
 <script>
   import numeric from 'vuelidate/lib/validators/numeric'
   import required from 'vuelidate/lib/validators/required'
+  import JsPDF from 'jspdf'
 
   import ActeRow from './ActeRow'
 
@@ -81,13 +111,17 @@
         infos: {
         },
         docteurs: [],
+        hasExtra: false,
+        addOrdonnance: false,
+        extra: '',
         form: {
           dateConsultation: '', // this.$route.query.infos.dateConsultation,
           fraisConsultation: '', // this.$route.query.infos.fraisConsultation,
           nomDocteur: '', // this.$route.query.infos.nomDocteur,
           note: '', // this.$route.query.infos.note,
           medecin: '',
-          idPatient: ''// this.$route.query.infos.idPatient
+          idPatient: '', // this.$route.query.infos.idPatient
+          noteOrdonnance: ''
         },
         idConsultation: Number(this.$route.query.id.idConsultation),
         myDate: new Date(),
@@ -169,6 +203,25 @@
       },
       onChange: function (event) {
         console.log(event.target.value)
+        this.$data.addOrdonnance = true
+      },
+      newOrdonnance: function () {
+        let noteFinale = this.$data.form.noteOrdonnance + ';' + this.$data.extra
+        conn.query('INSERT INTO Ordonnance(idPatient, note) VALUES(?, ?)', [this.$data.form.idPatient, noteFinale],
+          (err, results, fields) => {
+            if (err) throw err
+            console.log('New Ordonnance: ', results)
+            // Default export is a4 paper, portrait, using milimeters for units
+            var doc = new JsPDF()
+
+            doc.text(this.$data.form.nomDocteur, 20, 20)
+            doc.text(this.$data.form.dateConsultation, 120, 20)
+            doc.text(80, 30, 'Ordonnance')
+            doc.text(40, 60, this.$data.form.noteOrdonnance)
+            doc.text(40, 70, this.$data.extra)
+            doc.text(120, 120, 'Signature')
+            doc.save('a4.pdf')
+          })
       }
     },
     props: [

@@ -5,6 +5,7 @@
         :to="`${routes.page}`">
           <nav>{{ routes.text }}</nav>
         </router-link>
+        <img class="home-logo" src="../assets/check-up.png">
   </div>
 </template>
 
@@ -16,7 +17,7 @@
         links: [
           {
             id: 0,
-            text: 'Home',
+            text: 'Deconnexion',
             page: '/'
           },
           {
@@ -38,6 +39,11 @@
             id: 4,
             text: 'Agenda',
             page: '/rdv/liste'
+          },
+          {
+            id: 5,
+            text: 'Statistiques',
+            page: '/finances'
           }
         ]
       }
@@ -74,5 +80,10 @@
   .sidenav a:hover {
     background-color: #ddd;
     color: black;
+  }
+
+  .home-logo {
+    height: 150px;
+    top: 560px; 
   }
 </style>

@@ -31,9 +31,9 @@
         <input class="form__input" v-model.trim="$v.form.naissance.$model" type="date"/>
       </div>
       <div class="error" v-if="!$v.form.emailValue.required">Le champ date de naissance est obligatoire!</div>
-
-      <!--<button v-on:click="newPatient">{{ title }}</button>-->
-      <input type="submit" name="" :value="title" v-on:click="newPatient">
+      <br>
+      <br>
+      <h2><button class="btn" v-on:click="newPatient">{{ title }}</button></h2>
     </form>
   </div>
 </template>

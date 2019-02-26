@@ -12,13 +12,13 @@
           <div class="modal-body">
             <slot name="body">
             </slot>
-            <Machoire/>
+            <!--<Machoire/>-->
           </div>
 
           <div class="modal-footer">
             <slot name="footer">
               <button id="close-btn" class="btn" @click="$emit('close')">
-                OK
+                CLOSE
               </button>
             </slot>
           </div>

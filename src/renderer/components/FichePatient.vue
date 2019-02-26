@@ -1,21 +1,37 @@
 <template>
   <div class="content">
-    <router-link :to="{ name: 'liste-patient' }">Retour</router-link>
+    <router-link :to="{ name: 'liste-patient' }">
+      <img class="left-arrow" src="../assets/back.png"/>
+    </router-link>
+    <br>
+    <br>
+    <br>
     <h2>
       ID Patient: {{ $route.query.infos.id }}
       {{ getPatientData }}
       <button class="btn" id="show-modal" @click="showModal = true">Observation</button>
+      <!--<button class="btn" id="new-ordonnance" @click="newOrdonnance = true">Ordonnance</button>-->
       <!-- use the modal component, pass in the prop -->
       <Modal v-if="showModal" @close="showModal = false">
         <!--
           you can use custom content here to overwrite
           default content
         -->
-          <div>
-            <!-- Illustration des dents -->
-            <Machoire class="modal-container" />
-          </div>
-        <h3 slot="header">Hello Test</h3>
+
+        <hr>
+        <h3 slot="header">
+          Historique Actes
+          <!-- Illustration des dents -->
+          <Machoire/>
+        </h3>
+
+      </Modal>
+      <Modal v-if="newOrdonnance" @close="newOrdonnance = false">
+        <h3 slot="header">
+          <label class="form__label">Note Ordonnance</label>
+          <input class="form__input" v-model="$data.note"/>
+          <button class="btn" v-on:click="newOrdonnance">Ajouter</button>
+        </h3>
       </Modal>
     </h2>
     <form>
@@ -45,7 +61,7 @@
       <div class="error" v-if="!$v.form.emailValue.email">Email non valide!</div>
       <br>
 
-      <button v-on:click="editPatient" class="btn">{{ title }}</button>
+      <h2><button v-on:click="editPatient" class="btn">{{ title }}</button></h2>
     </form>
     <br>
     <fieldset>
@@ -67,7 +83,9 @@
       </table>
       <br>
       <button class="btn">
-        <router-link :to="{ name: 'add-consultation', query: { infos: { 'idPatient': this.$data.form.id } } }">New Consultation</router-link>
+        <h2>
+          <router-link :to="{ name: 'add-consultation', query: { infos: { 'idPatient': this.$data.form.id } } }">New Consultation</router-link>
+        </h2>
       </button>
     </fieldset>
   </div>
@@ -80,14 +98,21 @@
 
   import ConsultationRow from './ConsultationRow'
   import Modal from './Modal.vue'
+  import Machoire from './Machoire'
 
   const db = require('../database.js')
   const conn = db.getPool()
+/*
+  const createCanvas = require('canvas')
+  const canvas = createCanvas(200, 200)
+  const ctx = canvas.getContext('2d')
+*/
 
   export default {
     components: {
       ConsultationRow,
-      Modal
+      Modal,
+      Machoire
     },
     data () {
       return {
@@ -95,6 +120,7 @@
 
         },
         form: {
+          note: '',
           id: Number(this.$route.query.infos.id),
           firstName: '', // this.$route.query.infos.nom,
           lastName: '', // this.$route.query.infos.prenom,
@@ -104,7 +130,8 @@
         title: 'Enregistrer Modifications',
         consultations: [],
         dataIsHere: false,
-        showModal: false
+        showModal: false,
+        newOrdonnance: false
       }
     },
     props: [
@@ -142,6 +169,10 @@
             this.$data.dataIsHere = true
           })
         }
+      },
+      drawCanvas: function () {
+        // ctx.fillStyle = '#FF0000'
+        // ctx.fillRect(0, 0, 150, 75)
       }
     },
     methods: {
@@ -151,6 +182,13 @@
           (err, results, fields) => {
             if (err) throw err
             console.log('Patient Updated ', results)
+          })
+      },
+      newOrdonnance: function () {
+        conn.query('INSERT INTO Ordonnance(idPatient, note) VALUES(?, ?)', [this.$data.form.id, this.$data.form.note],
+          (err, results, fields) => {
+            if (err) throw err
+            console.log('New Ordonnance: ', results)
           })
       }
     },
@@ -209,7 +247,7 @@
   }
 
   .modal-container {
-    width: 330px;
+    width: 360px;
     margin: 0px auto;
     padding: 20px 30px;
     background-color: #fff;
@@ -254,4 +292,5 @@
     -webkit-transform: scale(1.1);
     transform: scale(1.1);
   }
+
 </style>

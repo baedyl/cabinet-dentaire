@@ -49,6 +49,8 @@
             (err, results, fields) => {
               if (err) throw err
               console.log('Consultation Deleted, ' + results)
+              alert('Consultation supprimee!')
+              window.history.go(-1)
             })
         }
       }

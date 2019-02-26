@@ -1,6 +1,8 @@
 <template>
   <tr>
-    <td>{{ acte.idActe }}</td>
+    <router-link :to="{ name: 'fiche-acte', query: { id: { 'idActe': acte.idActe } } }">
+      <td>{{ acte.idActe }}</td>
+    </router-link>
     <td>{{ acte.libelle }}</td>
     <td>{{ acte.noteActe }}</td>
     <router-link :to="{ name: 'fiche-consultation', query: { infos: { 'idConsultation': acte.Consultation_idConsultation } } }">
@@ -39,6 +41,7 @@
             (err, results, fields) => {
               if (err) throw err
               console.log('Acte Deleted, ' + results)
+              alert('Acte Supprime!')
             })
         }
       }

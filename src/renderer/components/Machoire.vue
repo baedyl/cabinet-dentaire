@@ -24,9 +24,8 @@
 <style>
   img{
     position: absolute;
-    height: 300px;
-    top: 0px;
-    right: 0px;
+    height: 400px;
+    top: 70px;
     margin: 20px;
     /* border: 3px solid #73AD21; */
   }

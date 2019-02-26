@@ -1,6 +1,27 @@
 <template>
   <div class="content">
-    <router-link :to="{ name: 'fiche-consultation', query: { id: { 'idConsultation': this.$data.idConsultation } } }">Retour</router-link>
+    <router-link :to="{ name: 'fiche-consultation', query: { id: { 'idConsultation': this.$data.idConsultation } } }">
+      <img class="left-arrow" src="../assets/back.png"/>
+    </router-link>
+    <br>
+    <br>
+    <br>
+    <h3>
+      <button class="btn" id="show-modal" @click="showModal = true">Observation</button>
+    </h3>
+    <Modal v-if="showModal" @close="showModal = false">
+      <!--
+        you can use custom content here to overwrite
+        default content
+      -->
+        <div>
+          <!-- Illustration des dents -->
+          <Machoire/>
+        </div>
+      <h3 slot="header">
+
+      </h3>
+    </Modal>
     <form>
       <div class="form-group" :class="{ 'form-group--error': $v.form.libelle.$error }">
         <label class="form__label">Libelle Acte</label>
@@ -32,8 +53,8 @@
       <!--<button v-on:click="newActe">{{ title }}</button>-->
       <input type="submit" name="" :value="title" v-on:click="newActe">
 
-      <!-- Illustration des dents -->
-      <Machoire/>
+      <!-- Illustration des dents
+      <Machoire/>-->
     </form>
   </div>
 </template>
@@ -43,6 +64,7 @@
   import numeric from 'vuelidate/lib/validators/numeric'
 
   import Machoire from './Machoire'
+  import Modal from './Modal'
 
   const db = require('../database.js')
   const conn = db.getPool()
@@ -50,10 +72,12 @@
   export default {
     name: 'add-acte',
     components: {
-      Machoire
+      Machoire,
+      Modal
     },
     data () {
       return {
+        showModal: false,
         id: {
         },
         etats: [
@@ -79,6 +103,7 @@
           (err, results, fields) => {
             if (err) throw err
             console.log('New Acte : ', results)
+            this.$router.push({ name: 'fiche-consultation', query: { id: { 'idConsultation': this.$data.idConsultation } } })
           })
       }
     },
@@ -97,4 +122,9 @@
 </script>
 
 <style>
+  .left-arrow {
+    top: 0px;
+    height: 50px;
+    margin: 10px;
+  }
 </style>

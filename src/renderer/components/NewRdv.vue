@@ -33,9 +33,9 @@
         <input class="form__input" v-model="$data.form.note"/>
       </div>
 
-      <button type="submit" class="btn" v-on:click="newRdv">{{ title }}</button>
+      <h2><button type="submit" class="btn" v-on:click="newRdv">{{ title }}</button></h2>
       <div v-if="envoyerMail">
-        {{sendMail()}}
+        {{ sendMail() }}
       </div>
       <!--<button class="btn" v-on:click="sendMail">Send Mail</button>-->
     </form>
@@ -127,6 +127,24 @@
       }
     },
     methods: {
+      sendMail: function () {
+        emailjs.init('user_awm2wX3M7EMMitXz238N3')
+        var templateParams = {
+          mail_patient: mailPatient,
+          contact_number: Math.random() * 100000 | 0,
+          nom_patient: this.$data.patients[Number(this.$data.form.patient) - 1].nomComplet,
+          nom_docteur: this.$data.docteurs[Number(this.$data.form.medecin) - 1].nomComplet,
+          date_rdv: this.$data.form.dateRdv,
+          note: this.$data.form.note
+        }
+
+        emailjs.send('contact_service', 'new_rdv', templateParams)
+          .then((response) => {
+            console.log('SUCCESS!', response.status, response.text)
+          }, (err) => {
+            console.log('FAILED...', err)
+          })
+      },
       newRdv: function () {
         console.log('idDocteur: ' + this.$props.idDocteur)
         conn.query('INSERT INTO Rdv(dateRdv, Patient_idPatient, Docteur_idDocteur, noteRdv) VALUES(?, ?, ?, ?)',
@@ -135,6 +153,8 @@
             if (err) throw err
             console.log('New Rdv : ', results)
             this.$data.envoyerMail = true
+            this.sendMail()
+            this.$router.push({ name: 'liste-rdv' })
           })
       },
       onChange: function (event) {
@@ -160,24 +180,6 @@
       },
       verifyDate: function () {
 
-      },
-      sendMail: function () {
-        emailjs.init('user_awm2wX3M7EMMitXz238N3')
-        var templateParams = {
-          mail_patient: mailPatient,
-          contact_number: Math.random() * 100000 | 0,
-          nom_patient: this.$data.patients[Number(this.$data.form.patient) - 1].nomComplet,
-          nom_docteur: this.$data.docteurs[Number(this.$data.form.medecin) - 1].nomComplet,
-          date_rdv: this.$data.form.dateRdv,
-          note: this.$data.form.note
-        }
-
-        emailjs.send('contact_service', 'new_rdv', templateParams)
-          .then((response) => {
-            console.log('SUCCESS!', response.status, response.text)
-          }, (err) => {
-            console.log('FAILED...', err)
-          })
       }
     },
     validations: {

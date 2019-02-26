@@ -60,6 +60,17 @@ export default new Router({
       component: require('@/components/ListeRdv').default
     },
     {
+      path: '/actes/:id',
+      name: 'fiche-acte',
+      props: { default: true },
+      component: require('@/components/FicheActe').default
+    },
+    {
+      path: '/finances',
+      name: 'finances',
+      component: require('@/components/Finances').default
+    },
+    {
       path: '*',
       redirect: '/'
     }

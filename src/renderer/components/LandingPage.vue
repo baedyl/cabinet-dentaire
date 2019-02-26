@@ -4,8 +4,9 @@
     <main>
       <div class="left-side">
         <span class="title">
-          Gestion Cabinet Dentaire!
+          <h1>Gestion Cabinet Dentaire!</h1>
         </span>
+        <h2>Bienvenue Docteur: {{ nom }} {{ prenom }}</h2>
         <system-information></system-information>
       </div>
       <!--
@@ -17,6 +18,16 @@
       </div>
       -->
     </main>
+    <Modal v-if="!loggedIn">
+      <h3 slot="header">
+        <img class="lock" src="../assets/shield.png"/>
+        <label class="form__label">Username</label>
+        <input class="form__input" v-model="$data.username" type="text"/>
+        <label class="form__label">Password</label>
+        <input class="form__input" v-model="$data.password" type="password"/>
+        <button class="btn" v-on:click="login">Se Connecter</button>
+      </h3>
+    </Modal>
   </div>
 </template>
 
@@ -26,6 +37,7 @@
   import ButtonAgenda from './LandingPage/ButtonAgenda'
   import ButtonNewPatient from './LandingPage/ButtonNewPatient'
   import ButtonListePatients from './LandingPage/ButtonListePatients'
+  import Modal from './Modal'
 
   const db = require('../database.js')
   const conn = db.getPool()
@@ -44,11 +56,31 @@
       ButtonPatients,
       ButtonAgenda,
       ButtonNewPatient,
-      ButtonListePatients
+      ButtonListePatients,
+      Modal
+    },
+    data () {
+      return {
+        loggedIn: false,
+        username: '',
+        password: '',
+        nom: '',
+        prenom: ''
+      }
     },
     methods: {
       open (link) {
         this.$electron.shell.openExternal(link)
+      },
+      login: function () {
+        conn.query('SELECT * FROM Personnel WHERE mail = ?', [this.$data.username], (err, results, fields) => {
+          if (err) throw err
+          if (results[0].password === this.$data.password) {
+            this.$data.loggedIn = true
+            this.$data.nom = results[0].nom
+            this.$data.prenom = results[0].prenom
+          }
+        })
       }
     }
   }
@@ -133,5 +165,14 @@
 
     color: #42b983;
     background-color: transparent;
+  }
+
+  .btn:hover {
+    background-color: #4CAF50;
+    color: white;
+  }
+
+  .lock {
+    height: 250px;
   }
 </style>
