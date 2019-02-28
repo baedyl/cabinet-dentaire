@@ -143,8 +143,6 @@
             this.$router.push({ name: 'fiche-patient', query: { infos: { id: this.$data.form.idPatient } } })
           })
       },
-      getMedecins: {
-      },
       onChange: function (event) {
         console.log(event.target.value)
         this.$data.addOrdonnance = true

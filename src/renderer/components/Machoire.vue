@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div  v-on:click="showCoords($event)">
     <img src="../assets/dents.png"/>
     <p id="img_coordinate"></p>
   </div>
@@ -15,6 +15,11 @@
       }
     },
     methods: {
+      showCoords: function (event) {
+        var x = event.clientX
+        var y = event.clientY
+        console.log(x + ', ' + y)
+      }
     },
     computed: {
     }
@@ -25,7 +30,7 @@
   img{
     position: absolute;
     height: 400px;
-    top: 70px;
+    top: 50px;
     margin: 20px;
     /* border: 3px solid #73AD21; */
   }

@@ -9,6 +9,8 @@
     <h2>
       ID Patient: {{ $route.query.infos.id }}
       {{ getPatientData }}
+      {{ getConsultations }}
+      {{ getActesPatient }}
       <button class="btn" id="show-modal" @click="showModal = true">Observation</button>
       <!--<button class="btn" id="new-ordonnance" @click="newOrdonnance = true">Ordonnance</button>-->
       <!-- use the modal component, pass in the prop -->
@@ -19,20 +21,29 @@
         -->
 
         <hr>
-        <h3 slot="header">
+        <h4 slot="header">
+          <svg width="100" height="100">
+             <circle cx="50" cy="50" r="10" stroke="green" stroke-width="4" fill="yellow" />
+             Sorry, your browser does not support inline SVG.
+          </svg>
           Historique Actes
+          <li v-for="acte in actes" :value="acte.idActe">
+            {{ acte.libelle }} {{ acte.dentActe }}
+          </li>
           <!-- Illustration des dents -->
           <Machoire/>
-        </h3>
+        </h4>
 
       </Modal>
-      <Modal v-if="newOrdonnance" @close="newOrdonnance = false">
+      <!--
+      <Modal v-if="hasOrdonnance" @close="hasOrdonnance = false">
         <h3 slot="header">
           <label class="form__label">Note Ordonnance</label>
           <input class="form__input" v-model="$data.note"/>
           <button class="btn" v-on:click="newOrdonnance">Ajouter</button>
         </h3>
       </Modal>
+    -->
     </h2>
     <form>
       <div class="form-group" :class="{ 'form-group--error': $v.form.firstName.$error }">
@@ -66,7 +77,6 @@
     <br>
     <fieldset>
       <legend>Consultations Patient</legend>
-      {{ getConsultations }}
       <table>
         <tr>
           <th>#ID</th>
@@ -129,9 +139,10 @@
         },
         title: 'Enregistrer Modifications',
         consultations: [],
+        actes: [],
         dataIsHere: false,
         showModal: false,
-        newOrdonnance: false
+        hasOrdonnance: false
       }
     },
     props: [
@@ -170,9 +181,31 @@
           })
         }
       },
-      drawCanvas: function () {
-        // ctx.fillStyle = '#FF0000'
-        // ctx.fillRect(0, 0, 150, 75)
+      getActesPatient: function () {
+        if (this.$data.actes.length === 0) { // In case there are no acts, test with a boolean var to execute this prop only once
+          for (let consultation of this.$data.consultations) {
+            console.log('Id Consultation : ', consultation.idConsultation)
+
+            conn.query('SELECT * FROM Acte WHERE Consultation_idConsultation = ?', [consultation.idConsultation],
+              (err, results, fields) => {
+                if (err) throw err
+                console.log(results)
+                if (results.length > 0) {
+                  for (let acte of results) {
+                    /* let acte = {
+                      'libelle': results[0].libelle,
+                      'note': results[0].noteActe,
+                      'dent': results[0].dentActe,
+                      'etat': results[0].etatActe
+                    }
+                    */
+                    this.$data.actes.push(acte)
+                  }
+                }
+              })
+          }
+        }
+        console.log(this.$data.actes)
       }
     },
     methods: {
@@ -257,8 +290,9 @@
     font-family: Helvetica, Arial, sans-serif;
   }
 
-  .modal-header h3 {
-    margin-top: 410px;
+  .modal-header h4 {
+    margin-top: 450px;
+    padding: 20px;
     color: #42b983;
   }
 

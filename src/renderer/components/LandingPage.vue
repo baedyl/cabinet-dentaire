@@ -61,7 +61,7 @@
     },
     data () {
       return {
-        loggedIn: false,
+        loggedIn: true, // false,
         username: '',
         password: '',
         nom: '',

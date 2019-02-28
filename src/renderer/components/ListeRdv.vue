@@ -3,6 +3,9 @@
     {{ getAllRdv }}
     <div id='calendar'>
       {{ loadCalendar }}
+      <div v-if="clickedRdv">
+        {{ detailsRdv() }}
+      </div>
     </div>
   </div>
 </template>
@@ -17,10 +20,18 @@
   const conn = db.getPool()
 
   var globalEvents = []
+  var currentEvent = {}
   export default {
     data () {
       return {
-        rdvs: []
+        rdvs: [],
+        clickedRdv: false
+      }
+    },
+    methods: {
+      detailsRdv: function () {
+        console.log(currentEvent)
+        this.$router.push({ name: 'liste-patient' })
       }
     },
     computed: {
@@ -37,7 +48,7 @@
                 'start': r.dateRdv,
                 'allDay': false,
                 'idPatient': r.Patient_idPatient,
-                'url': ''
+                'url': '/patients/liste'
               }
               globalEvents.push(rdv)
             }
@@ -58,9 +69,11 @@
             },
             events: globalEvents,
             eventClick: function (event) {
+              // this.$router.push({ name: 'liste-patient' })
+              currentEvent = event
+              console.log(event)
               // change the border color just for fun
               $(this).css('border-color', 'red')
-
               this.open(event.url)
               return false
             }
