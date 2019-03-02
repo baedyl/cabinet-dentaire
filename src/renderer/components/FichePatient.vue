@@ -11,6 +11,8 @@
       {{ getPatientData }}
       {{ getConsultations }}
       {{ getActesPatient }}
+      {{ initTeethGraphics }}
+      {{ getAntecedantsPatient }}
       <button class="btn" id="show-modal" @click="showModal = true">Observation</button>
       <!--<button class="btn" id="new-ordonnance" @click="newOrdonnance = true">Ordonnance</button>-->
       <!-- use the modal component, pass in the prop -->
@@ -21,18 +23,20 @@
         -->
 
         <hr>
-        <h4 slot="header">
-          <svg width="100" height="100">
-             <circle cx="50" cy="50" r="10" stroke="green" stroke-width="4" fill="yellow" />
-             Sorry, your browser does not support inline SVG.
-          </svg>
+        <h6 slot="header">
+
           Historique Actes
           <li v-for="acte in actes" :value="acte.idActe">
-            {{ acte.libelle }} {{ acte.dentActe }}
+            {{ acte.libelle }} {{ acte.dentActe }} {{ acte.etatActe }}
           </li>
           <!-- Illustration des dents -->
-          <Machoire/>
-        </h4>
+          <div class="" v-on:click="showCoords($event)">
+            <svg class="dots" width="300" height="420">
+               <circle v-for="acte in actes" class="colorCircle" v-bind:cx="acte.valX" v-bind:cy="acte.valY" r="10" v-bind:stroke="acte.color" stroke-width="4" v-bind:fill="acte.color" />
+            </svg>
+            <img src="../assets/dents.png"/>
+          </div>
+        </h6>
 
       </Modal>
       <!--
@@ -45,35 +49,49 @@
       </Modal>
     -->
     </h2>
-    <form>
-      <div class="form-group" :class="{ 'form-group--error': $v.form.firstName.$error }">
-        <label class="form__label">Nom Patient</label>
-        <input class="form__input" v-model.trim="$v.form.firstName.$model"/>
-      </div>
-      <div class="error" v-if="!$v.form.firstName.required">Le champ nom est obligatoire!</div>
+    <div class="form-container">
+      <form class="edit-form">
+        <div class="form-group" :class="{ 'form-group--error': $v.form.firstName.$error }">
+          <label class="form__label">Nom Patient</label>
+          <input class="form__input" v-model.trim="$v.form.firstName.$model"/>
+        </div>
+        <div class="error" v-if="!$v.form.firstName.required">Le champ nom est obligatoire!</div>
 
-      <div class="form-group" :class="{ 'form-group--error': $v.form.lastName.$error }">
-        <label class="form__label">Prenom Patient</label>
-        <input class="form__input" v-model.trim="$v.form.lastName.$model"/>
-      </div>
-      <div class="error" v-if="!$v.form.lastName.required">Le champ prenom est obligatoire!</div>
+        <div class="form-group" :class="{ 'form-group--error': $v.form.lastName.$error }">
+          <label class="form__label">Prenom Patient</label>
+          <input class="form__input" v-model.trim="$v.form.lastName.$model"/>
+        </div>
+        <div class="error" v-if="!$v.form.lastName.required">Le champ prenom est obligatoire!</div>
 
-      <div class="form-group" :class="{ 'form-group--error': $v.form.telephone.$error }">
-        <label class="form__label">Telephone Patient</label>
-        <input class="form__input" v-model.trim="$v.form.telephone.$model"/>
-      </div>
-      <div class="error" v-if="!$v.form.telephone.numeric">Numero de Telephone non valide!</div>
+        <div class="form-group" :class="{ 'form-group--error': $v.form.telephone.$error }">
+          <label class="form__label">Telephone Patient</label>
+          <input class="form__input" v-model.trim="$v.form.telephone.$model"/>
+        </div>
+        <div class="error" v-if="!$v.form.telephone.numeric">Numero de Telephone non valide!</div>
 
-      <div class="form-group" :class="{ 'form-group--error': $v.form.emailValue.$error }">
-        <label class="form__label">Email Patient</label>
-        <input class="form__input" v-model.trim="$v.form.emailValue.$model"/>
-      </div>
-      <div class="error" v-if="!$v.form.emailValue.required">Le champ Email est obligatoire!</div>
-      <div class="error" v-if="!$v.form.emailValue.email">Email non valide!</div>
-      <br>
+        <div class="form-group" :class="{ 'form-group--error': $v.form.emailValue.$error }">
+          <label class="form__label">Email Patient</label>
+          <input class="form__input" v-model.trim="$v.form.emailValue.$model"/>
+        </div>
+        <div class="error" v-if="!$v.form.emailValue.required">Le champ Email est obligatoire!</div>
+        <div class="error" v-if="!$v.form.emailValue.email">Email non valide!</div>
+        <br>
 
-      <h2><button v-on:click="editPatient" class="btn">{{ title }}</button></h2>
-    </form>
+        <h2><button v-on:click="editPatient" class="btn">{{ title }}</button></h2>
+      </form>
+
+      <div class="antecedant">
+        <fieldset>
+          <legend>Antecedants</legend>
+          <ul v-for="ante in antecedants">
+            <li>{{ ante.description }} {{ ante.note }}</li>
+          </ul>
+          <input class="form__input" v-model="newAntecedant"/>
+          <button class="btn">Ajouter</button>
+        </fieldset>
+      </div>
+    </div>
+
     <br>
     <fieldset>
       <legend>Consultations Patient</legend>
@@ -108,7 +126,7 @@
 
   import ConsultationRow from './ConsultationRow'
   import Modal from './Modal.vue'
-  import Machoire from './Machoire'
+  // import Machoire from './Machoire'
 
   const db = require('../database.js')
   const conn = db.getPool()
@@ -121,14 +139,18 @@
   export default {
     components: {
       ConsultationRow,
-      Modal,
-      Machoire
+      Modal
+      // , Machoire
     },
     data () {
       return {
         infos: {
 
         },
+        teethGraphics: new Map(),
+        valX: 0,
+        valY: 0,
+        drawCircle: false,
         form: {
           note: '',
           id: Number(this.$route.query.infos.id),
@@ -139,10 +161,13 @@
         },
         title: 'Enregistrer Modifications',
         consultations: [],
+        antecedants: [],
         actes: [],
         dataIsHere: false,
         showModal: false,
-        hasOrdonnance: false
+        hasOrdonnance: false,
+        antecedantIsHere: false,
+        newAntecedant: ''
       }
     },
     props: [
@@ -199,6 +224,21 @@
                       'etat': results[0].etatActe
                     }
                     */
+                    let obj = this.$data.teethGraphics.get(String(acte.dentActe))
+                    let valX = 0
+                    let valY = 0
+                    let i = 0
+                    for (let val in obj) {
+                      if (i === 0) valX = obj[val]
+                      else valY = obj[val]
+                      i += 1
+                    }
+                    if (acte.etatActe === 'Done') acte.color = 'green'
+                    else if (acte.etatActe === 'Pending') acte.color = 'yellow'
+                    else acte.color = 'red'
+
+                    acte.valX = valX
+                    acte.valY = valY
                     this.$data.actes.push(acte)
                   }
                 }
@@ -206,6 +246,59 @@
           }
         }
         console.log(this.$data.actes)
+      },
+      initTeethGraphics: function () {
+        // Set up the positions to draw the teeth on the image
+        // En haut
+        this.$data.teethGraphics.set('11', { 'x': 142, 'y': 65 })
+        this.$data.teethGraphics.set('21', { 'x': 163, 'y': 65 })
+        this.$data.teethGraphics.set('12', { 'x': 124, 'y': 74 })
+        this.$data.teethGraphics.set('22', { 'x': 184, 'y': 74 })
+        this.$data.teethGraphics.set('13', { 'x': 108, 'y': 85 })
+        this.$data.teethGraphics.set('23', { 'x': 199, 'y': 85 })
+        this.$data.teethGraphics.set('14', { 'x': 98, 'y': 104 })
+        this.$data.teethGraphics.set('24', { 'x': 209, 'y': 104 })
+        this.$data.teethGraphics.set('15', { 'x': 90, 'y': 125 })
+        this.$data.teethGraphics.set('25', { 'x': 215, 'y': 125 })
+        this.$data.teethGraphics.set('16', { 'x': 83, 'y': 146 })
+        this.$data.teethGraphics.set('26', { 'x': 224, 'y': 146 })
+        this.$data.teethGraphics.set('17', { 'x': 77, 'y': 176 })
+        this.$data.teethGraphics.set('27', { 'x': 226, 'y': 176 })
+        this.$data.teethGraphics.set('18', { 'x': 77, 'y': 202 })
+        this.$data.teethGraphics.set('28', { 'x': 228, 'y': 202 })
+
+        // En bas
+        /* this.$data.teethGraphics.set('11', { 'x': 136, 'y': 65 })
+        this.$data.teethGraphics.set('21', { 'x': 157, 'y': 65 })
+        this.$data.teethGraphics.set('12', { 'x': 116, 'y': 74 })
+        this.$data.teethGraphics.set('22', { 'x': 178, 'y': 74 })
+        this.$data.teethGraphics.set('13', { 'x': 100, 'y': 85 })
+        this.$data.teethGraphics.set('23', { 'x': 192, 'y': 85 })
+        this.$data.teethGraphics.set('14', { 'x': 89, 'y': 104 })
+        this.$data.teethGraphics.set('24', { 'x': 201, 'y': 104 })
+        this.$data.teethGraphics.set('15', { 'x': 83, 'y': 125 })
+        this.$data.teethGraphics.set('25', { 'x': 210, 'y': 125 })
+        this.$data.teethGraphics.set('16', { 'x': 76, 'y': 146 })
+        this.$data.teethGraphics.set('26', { 'x': 217, 'y': 146 })
+        this.$data.teethGraphics.set('17', { 'x': 73, 'y': 176 })
+        this.$data.teethGraphics.set('27', { 'x': 219, 'y': 176 })
+        this.$data.teethGraphics.set('18', { 'x': 70, 'y': 202 })
+        this.$data.teethGraphics.set('28', { 'x': 220, 'y': 202 }) */
+      },
+      getAntecedantsPatient: function () {
+        // console.log(this.$data.dataIsHere)
+        if (this.$data.antecedantIsHere === false) {
+          console.log('Reading the Database...')
+          conn.query('SELECT * FROM Antecedant WHERE Patient_idPatient = ?', [this.$data.form.id], (err, results, fields) => {
+            if (err) throw err
+            console.log('Atecedant Patient SQL : ', results)
+            for (var c of results) {
+              console.log('Infos : ', c)
+              this.$data.antecedants.push(c)
+            }
+            this.$data.antecedantIsHere = true
+          })
+        }
       }
     },
     methods: {
@@ -223,6 +316,17 @@
             if (err) throw err
             console.log('New Ordonnance: ', results)
           })
+      },
+      showCoords: function (event) {
+        var x = event.offsetX
+        var y = event.offsetY
+        console.log('Before: ' + x + ', ' + y)
+
+        // Change the values acknowlegding the css
+        this.$data.valX = x
+        this.$data.valY = y
+        this.$data.drawCircle = true
+        console.log('Map: ' + this.$data.teethGraphics)
       }
     },
     validations: {
@@ -252,6 +356,14 @@
   padding-left: 20px;
   }
 
+  img{
+    /* position: absolute; */
+    height: 400px;
+    top: 50px;
+    margin: 20px;
+    /* border: 3px solid #73AD21; */
+  }
+
   fieldset
   {
     background-color:#CCC;
@@ -262,6 +374,42 @@
     margin-bottom:0px;
     margin-left:16px;
   }
+
+  .container {
+    position: relative;
+  }
+
+  .form-container {
+    display: flex;
+    width: 900px;
+    justify-content: space-between;
+    margin: 20px;
+  }
+
+  .edit-form {
+    width: 425px;
+  }
+
+  .antecedant {
+    /* border: 1px solid #000; */
+    justify-content: flex-end;
+    width: 425px;
+  }
+
+  .dots {
+    float: left;
+    position: absolute;
+    left: 450px;
+    top: 50px;
+    z-index: 1000;
+    opacity: 0.5;
+     /*
+     background-color: #92AD40;
+     padding: 5px;
+     color: #FFFFFF;
+     font-weight: bold; */
+  }
+
   .modal-mask {
     position: fixed;
     z-index: 9998;
@@ -280,7 +428,7 @@
   }
 
   .modal-container {
-    width: 360px;
+    width: 390px;
     margin: 0px auto;
     padding: 20px 30px;
     background-color: #fff;
@@ -288,16 +436,17 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
     transition: all .3s ease;
     font-family: Helvetica, Arial, sans-serif;
+    /*  */
   }
 
-  .modal-header h4 {
+  .modal-header h6 {
     margin-top: 450px;
     padding: 20px;
     color: #42b983;
   }
 
   .modal-body {
-    margin: 100px 0;
+    margin: 35px 0;
   }
 
   .modal-default-button {
