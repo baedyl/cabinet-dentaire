@@ -3,7 +3,9 @@
     <div class="modal-mask">
       <div class="modal-wrapper">
         <div class="modal-container">
-
+          <button id="close-btn" class="btn" @click="$emit('close')">
+            X
+          </button>
           <div class="modal-header">
             <slot name="header">
             </slot>
@@ -17,9 +19,6 @@
 
           <div class="modal-footer">
             <slot name="footer">
-              <button id="close-btn" class="btn" @click="$emit('close')">
-                CLOSE
-              </button>
             </slot>
           </div>
         </div>
@@ -38,5 +37,10 @@
   }
 </script>
 
-<style lang="css" scoped>
+<style>
+  #close-btn {
+    top: 0px;
+    right: -400px;
+    position: relative;
+  }
 </style>

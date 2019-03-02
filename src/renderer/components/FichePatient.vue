@@ -12,6 +12,7 @@
       {{ getConsultations }}
       {{ getActesPatient }}
       {{ initTeethGraphics }}
+      {{ getAntecedantsPatient }}
       <button class="btn" id="show-modal" @click="showModal = true">Observation</button>
       <!--<button class="btn" id="new-ordonnance" @click="newOrdonnance = true">Ordonnance</button>-->
       <!-- use the modal component, pass in the prop -->
@@ -48,35 +49,49 @@
       </Modal>
     -->
     </h2>
-    <form>
-      <div class="form-group" :class="{ 'form-group--error': $v.form.firstName.$error }">
-        <label class="form__label">Nom Patient</label>
-        <input class="form__input" v-model.trim="$v.form.firstName.$model"/>
-      </div>
-      <div class="error" v-if="!$v.form.firstName.required">Le champ nom est obligatoire!</div>
+    <div class="form-container">
+      <form class="edit-form">
+        <div class="form-group" :class="{ 'form-group--error': $v.form.firstName.$error }">
+          <label class="form__label">Nom Patient</label>
+          <input class="form__input" v-model.trim="$v.form.firstName.$model"/>
+        </div>
+        <div class="error" v-if="!$v.form.firstName.required">Le champ nom est obligatoire!</div>
 
-      <div class="form-group" :class="{ 'form-group--error': $v.form.lastName.$error }">
-        <label class="form__label">Prenom Patient</label>
-        <input class="form__input" v-model.trim="$v.form.lastName.$model"/>
-      </div>
-      <div class="error" v-if="!$v.form.lastName.required">Le champ prenom est obligatoire!</div>
+        <div class="form-group" :class="{ 'form-group--error': $v.form.lastName.$error }">
+          <label class="form__label">Prenom Patient</label>
+          <input class="form__input" v-model.trim="$v.form.lastName.$model"/>
+        </div>
+        <div class="error" v-if="!$v.form.lastName.required">Le champ prenom est obligatoire!</div>
 
-      <div class="form-group" :class="{ 'form-group--error': $v.form.telephone.$error }">
-        <label class="form__label">Telephone Patient</label>
-        <input class="form__input" v-model.trim="$v.form.telephone.$model"/>
-      </div>
-      <div class="error" v-if="!$v.form.telephone.numeric">Numero de Telephone non valide!</div>
+        <div class="form-group" :class="{ 'form-group--error': $v.form.telephone.$error }">
+          <label class="form__label">Telephone Patient</label>
+          <input class="form__input" v-model.trim="$v.form.telephone.$model"/>
+        </div>
+        <div class="error" v-if="!$v.form.telephone.numeric">Numero de Telephone non valide!</div>
 
-      <div class="form-group" :class="{ 'form-group--error': $v.form.emailValue.$error }">
-        <label class="form__label">Email Patient</label>
-        <input class="form__input" v-model.trim="$v.form.emailValue.$model"/>
-      </div>
-      <div class="error" v-if="!$v.form.emailValue.required">Le champ Email est obligatoire!</div>
-      <div class="error" v-if="!$v.form.emailValue.email">Email non valide!</div>
-      <br>
+        <div class="form-group" :class="{ 'form-group--error': $v.form.emailValue.$error }">
+          <label class="form__label">Email Patient</label>
+          <input class="form__input" v-model.trim="$v.form.emailValue.$model"/>
+        </div>
+        <div class="error" v-if="!$v.form.emailValue.required">Le champ Email est obligatoire!</div>
+        <div class="error" v-if="!$v.form.emailValue.email">Email non valide!</div>
+        <br>
 
-      <h2><button v-on:click="editPatient" class="btn">{{ title }}</button></h2>
-    </form>
+        <h2><button v-on:click="editPatient" class="btn">{{ title }}</button></h2>
+      </form>
+
+      <div class="antecedant">
+        <fieldset>
+          <legend>Antecedants</legend>
+          <ul v-for="ante in antecedants">
+            <li>{{ ante.description }} {{ ante.note }}</li>
+          </ul>
+          <input class="form__input" v-model="newAntecedant"/>
+          <button class="btn">Ajouter</button>
+        </fieldset>
+      </div>
+    </div>
+
     <br>
     <fieldset>
       <legend>Consultations Patient</legend>
@@ -146,10 +161,13 @@
         },
         title: 'Enregistrer Modifications',
         consultations: [],
+        antecedants: [],
         actes: [],
         dataIsHere: false,
         showModal: false,
-        hasOrdonnance: false
+        hasOrdonnance: false,
+        antecedantIsHere: false,
+        newAntecedant: ''
       }
     },
     props: [
@@ -231,7 +249,26 @@
       },
       initTeethGraphics: function () {
         // Set up the positions to draw the teeth on the image
-        this.$data.teethGraphics.set('11', { 'x': 136, 'y': 65 })
+        // En haut
+        this.$data.teethGraphics.set('11', { 'x': 142, 'y': 65 })
+        this.$data.teethGraphics.set('21', { 'x': 163, 'y': 65 })
+        this.$data.teethGraphics.set('12', { 'x': 124, 'y': 74 })
+        this.$data.teethGraphics.set('22', { 'x': 184, 'y': 74 })
+        this.$data.teethGraphics.set('13', { 'x': 108, 'y': 85 })
+        this.$data.teethGraphics.set('23', { 'x': 199, 'y': 85 })
+        this.$data.teethGraphics.set('14', { 'x': 98, 'y': 104 })
+        this.$data.teethGraphics.set('24', { 'x': 209, 'y': 104 })
+        this.$data.teethGraphics.set('15', { 'x': 90, 'y': 125 })
+        this.$data.teethGraphics.set('25', { 'x': 215, 'y': 125 })
+        this.$data.teethGraphics.set('16', { 'x': 83, 'y': 146 })
+        this.$data.teethGraphics.set('26', { 'x': 224, 'y': 146 })
+        this.$data.teethGraphics.set('17', { 'x': 77, 'y': 176 })
+        this.$data.teethGraphics.set('27', { 'x': 226, 'y': 176 })
+        this.$data.teethGraphics.set('18', { 'x': 77, 'y': 202 })
+        this.$data.teethGraphics.set('28', { 'x': 228, 'y': 202 })
+
+        // En bas
+        /* this.$data.teethGraphics.set('11', { 'x': 136, 'y': 65 })
         this.$data.teethGraphics.set('21', { 'x': 157, 'y': 65 })
         this.$data.teethGraphics.set('12', { 'x': 116, 'y': 74 })
         this.$data.teethGraphics.set('22', { 'x': 178, 'y': 74 })
@@ -246,7 +283,22 @@
         this.$data.teethGraphics.set('17', { 'x': 73, 'y': 176 })
         this.$data.teethGraphics.set('27', { 'x': 219, 'y': 176 })
         this.$data.teethGraphics.set('18', { 'x': 70, 'y': 202 })
-        this.$data.teethGraphics.set('28', { 'x': 220, 'y': 202 })
+        this.$data.teethGraphics.set('28', { 'x': 220, 'y': 202 }) */
+      },
+      getAntecedantsPatient: function () {
+        // console.log(this.$data.dataIsHere)
+        if (this.$data.antecedantIsHere === false) {
+          console.log('Reading the Database...')
+          conn.query('SELECT * FROM Antecedant WHERE Patient_idPatient = ?', [this.$data.form.id], (err, results, fields) => {
+            if (err) throw err
+            console.log('Atecedant Patient SQL : ', results)
+            for (var c of results) {
+              console.log('Infos : ', c)
+              this.$data.antecedants.push(c)
+            }
+            this.$data.antecedantIsHere = true
+          })
+        }
       }
     },
     methods: {
@@ -327,6 +379,23 @@
     position: relative;
   }
 
+  .form-container {
+    display: flex;
+    width: 900px;
+    justify-content: space-between;
+    margin: 20px;
+  }
+
+  .edit-form {
+    width: 425px;
+  }
+
+  .antecedant {
+    /* border: 1px solid #000; */
+    justify-content: flex-end;
+    width: 425px;
+  }
+
   .dots {
     float: left;
     position: absolute;
@@ -367,6 +436,7 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
     transition: all .3s ease;
     font-family: Helvetica, Arial, sans-serif;
+    /*  */
   }
 
   .modal-header h6 {
@@ -376,7 +446,7 @@
   }
 
   .modal-body {
-    margin: 50px 0;
+    margin: 35px 0;
   }
 
   .modal-default-button {
