@@ -1,7 +1,7 @@
 <template>
   <div class="content">
     <router-link :to="{ name: 'liste-patient' }">
-      <img class="left-arrow" src="../assets/back.png"/>
+      <img class="icon left-arrow" src="../assets/back.png"/>
     </router-link>
     <br>
     <br>
@@ -14,7 +14,7 @@
       {{ initTeethGraphics }}
       {{ getAntecedantsPatient }}
       <button class="btn" id="show-modal" @click="showModal = true">Observation</button>
-      <!--<button class="btn" id="new-ordonnance" @click="newOrdonnance = true">Ordonnance</button>-->
+      <button class="btn" id="new-antecedant" @click="ajoutAntecedant = true">Ajouter Antecedant</button>
       <!-- use the modal component, pass in the prop -->
       <Modal v-if="showModal" @close="showModal = false">
         <!--
@@ -83,11 +83,32 @@
       <div class="antecedant">
         <fieldset>
           <legend>Antecedants</legend>
-          <ul v-for="ante in antecedants">
-            <li>{{ ante.description }} {{ ante.note }}</li>
-          </ul>
-          <input class="form__input" v-model="newAntecedant"/>
-          <button class="btn">Ajouter</button>
+          <table>
+            <tr>
+              <th>#ID</th>
+              <th>description</th>
+              <th>note</th>
+              <th>Action</th>
+            </tr>
+            <AntecedantRow v-for="ante in antecedants"
+            :key="ante.idAntecedant"
+            :ante="ante"
+            />
+          </table>
+          <br>
+          <hr>
+          <br>
+          <form v-if="ajoutAntecedant">
+            <div class="form-group" :class="{ 'form-group--error': $v.descAntecedant.$error }">
+              <label class="form__label">Description Antecedant</label>
+              <input class="form__input" v-model.trim="$v.descAntecedant.$model"/>
+            </div>
+            <div class="error" v-if="!$v.descAntecedant.required">Le champ description est obligatoire!</div>
+            <label class="form__label">Note Antecedant</label>
+            <input class="form__input" v-model="noteAntecedant"/>
+            <button class="btn" @click="newAntecedant">Ajouter</button>
+            <button class="btn" @click="ajoutAntecedant = false">Annuler</button>
+          </form>
         </fieldset>
       </div>
     </div>
@@ -125,6 +146,7 @@
   import numeric from 'vuelidate/lib/validators/numeric'
 
   import ConsultationRow from './ConsultationRow'
+  import AntecedantRow from './AntecedantRow'
   import Modal from './Modal.vue'
   // import Machoire from './Machoire'
 
@@ -139,7 +161,8 @@
   export default {
     components: {
       ConsultationRow,
-      Modal
+      Modal,
+      AntecedantRow
       // , Machoire
     },
     data () {
@@ -167,7 +190,9 @@
         showModal: false,
         hasOrdonnance: false,
         antecedantIsHere: false,
-        newAntecedant: ''
+        descAntecedant: '',
+        noteAntecedant: '',
+        ajoutAntecedant: false
       }
     },
     props: [
@@ -327,9 +352,21 @@
         this.$data.valY = y
         this.$data.drawCircle = true
         console.log('Map: ' + this.$data.teethGraphics)
+      },
+      newAntecedant: function () {
+        conn.query('INSERT INTO Antecedant(description, note, Patient_idPatient) VALUES(?, ?, ?)', [this.$data.descAntecedant, this.$data.noteAntecedant, this.$data.form.id],
+          (err, results, fields) => {
+            if (err) throw err
+            console.log('New Antecedant: ', results)
+          })
+        this.$data.antecedantIsHere = false
+        this.$data.antecedants = []
       }
     },
     validations: {
+      descAntecedant: {
+        required
+      },
       form: {
         emailValue: {
           required,
@@ -375,25 +412,37 @@
     margin-left:16px;
   }
 
+  .icon {
+    height: 50px;
+    margin: 10px;
+  }
+  .left-arrow {
+    top: 0px;
+  }
+  .refresh {
+    top: 0px;
+    left: 300px;
+  }
+
   .container {
     position: relative;
   }
 
   .form-container {
     display: flex;
-    width: 900px;
+    width: 1250px;
     justify-content: space-between;
     margin: 20px;
   }
 
   .edit-form {
-    width: 425px;
+    width: 600px;
   }
 
   .antecedant {
     /* border: 1px solid #000; */
     justify-content: flex-end;
-    width: 425px;
+    width: 600px;
   }
 
   .dots {
