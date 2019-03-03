@@ -122,9 +122,4 @@
 </script>
 
 <style>
-  .left-arrow {
-    top: 0px;
-    height: 50px;
-    margin: 10px;
-  }
 </style>
