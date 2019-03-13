@@ -1,8 +1,7 @@
 <template>
   <div class="content">
-    {{ getAllRdv }}
-    <div id='calendar'>
-      {{ loadCalendar }}
+    {{ loadCalendar }}
+    <div id='calendar'>      
       <div v-if="clickedRdv">
         {{ detailsRdv() }}
       </div>
@@ -32,30 +31,31 @@
       detailsRdv: function () {
         console.log(currentEvent)
         this.$router.push({ name: 'liste-patient' })
+      },
+      getAllRdv: function () {
+      //  if (globalEvents.length === 0) {
+        console.log('Reading the Database...')
+        conn.query('SELECT * FROM Rdv', (err, results, fields) => {
+          if (err) throw err
+          console.log('Rdvs SQL : ', results)
+          for (var r of results) {
+            console.log('Rdv : ', r)
+            var rdv = {
+              'title': r.noteRdv,
+              'start': r.dateRdv,
+              'allDay': false,
+              'idPatient': r.Patient_idPatient,
+              'url': '/patients/liste'
+            }
+            globalEvents.push(rdv)
+          }
+        })
+      //  }
       }
     },
     computed: {
-      getAllRdv: function () {
-        if (globalEvents.length === 0) {
-          console.log('Reading the Database...')
-          conn.query('SELECT * FROM Rdv', (err, results, fields) => {
-            if (err) throw err
-            console.log('Rdvs SQL : ', results)
-            for (var r of results) {
-              console.log('Rdv : ', r)
-              var rdv = {
-                'title': r.noteRdv,
-                'start': r.dateRdv,
-                'allDay': false,
-                'idPatient': r.Patient_idPatient,
-                'url': '/patients/liste'
-              }
-              globalEvents.push(rdv)
-            }
-          })
-        }
-      },
       loadCalendar: function () {
+        this.getAllRdv()
         $(document).ready(function () {
           console.log('Hello Calendar!')
           $('#calendar').fullCalendar({

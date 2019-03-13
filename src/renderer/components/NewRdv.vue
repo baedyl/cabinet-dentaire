@@ -1,7 +1,7 @@
 <template>
   <div class="content">
     <!--<router-link :to="{ name: 'fiche-patient', query: { infos: { 'id': form.idPatient }}}">Retour</router-link>-->
-    <form>
+    <form class="edit-form">
       <div class="form-group" :class="{ 'form-group--error': $v.form.dateRdv.$error }">
         <label class="form__label">Date et Heure Rdv</label>
         <input class="form__input" v-model.trim="$v.form.dateRdv.$model" type="datetime-local" @change="verifyDate"/>
