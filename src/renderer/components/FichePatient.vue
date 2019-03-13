@@ -14,7 +14,7 @@
       {{ initTeethGraphics }}
       {{ getAntecedantsPatient }}
       <button class="btn" id="show-modal" @click="showModal = true">Observation</button>
-      <button class="btn" id="new-antecedant" @click="ajoutAntecedant = true">Ajouter Antecedant</button>
+      <button class="btn" id="new-antecedant" @click="ajoutAntecedant = (ajoutAntecedant === false)? true : false">Ajouter Antecedant</button>
       <!-- use the modal component, pass in the prop -->
       <Modal v-if="showModal" @close="showModal = false">
         <!--
