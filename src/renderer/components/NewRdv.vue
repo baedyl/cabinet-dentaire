@@ -128,7 +128,7 @@
     },
     methods: {
       sendMail: function () {
-        emailjs.init('user_awm2wX3M7EMMitXz238N3')
+        emailjs.init('user_8KP7KZHOdVixsnfQ6b6si')
         var templateParams = {
           mail_patient: mailPatient,
           contact_number: Math.random() * 100000 | 0,

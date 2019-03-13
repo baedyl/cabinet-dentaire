@@ -1,6 +1,6 @@
 <template>
   <div class="content">
-    <form>
+    <form class="edit-form">
       <div class="form-group" :class="{ 'form-group--error': $v.form.firstName.$error }">
         <label class="form__label">Nom Patient</label>
         <input class="form__input" v-model.trim="$v.form.firstName.$model"/>
@@ -67,6 +67,7 @@
           (err, results, fields) => {
             if (err) throw err
             console.log('New Patient : ', results)
+            this.$router.push({ name: 'liste-patient' })
           })
       }
     },

@@ -1,7 +1,7 @@
 <template>
   <div class="content">
     {{ loadCalendar }}
-    <div id='calendar'>      
+    <div id='calendar'>
       <div v-if="clickedRdv">
         {{ detailsRdv() }}
       </div>
@@ -33,24 +33,24 @@
         this.$router.push({ name: 'liste-patient' })
       },
       getAllRdv: function () {
-      //  if (globalEvents.length === 0) {
-        console.log('Reading the Database...')
-        conn.query('SELECT * FROM Rdv', (err, results, fields) => {
-          if (err) throw err
-          console.log('Rdvs SQL : ', results)
-          for (var r of results) {
-            console.log('Rdv : ', r)
-            var rdv = {
-              'title': r.noteRdv,
-              'start': r.dateRdv,
-              'allDay': false,
-              'idPatient': r.Patient_idPatient,
-              'url': '/patients/liste'
+        if (globalEvents.length === 0) {
+          console.log('Reading the Database...')
+          conn.query('SELECT * FROM Rdv', (err, results, fields) => {
+            if (err) throw err
+            console.log('Rdvs SQL : ', results)
+            for (var r of results) {
+              console.log('Rdv : ', r)
+              var rdv = {
+                'title': r.noteRdv,
+                'start': r.dateRdv,
+                'allDay': false,
+                'idPatient': r.Patient_idPatient,
+                'url': '/patients/liste'
+              }
+              globalEvents.push(rdv)
             }
-            globalEvents.push(rdv)
-          }
-        })
-      //  }
+          })
+        }
       }
     },
     computed: {

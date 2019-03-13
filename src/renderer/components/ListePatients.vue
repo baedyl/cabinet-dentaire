@@ -83,14 +83,16 @@
           })
         }
       },
-      // Search the nomPatient and prenomPatient
+      // Search the nomPatient and prenomPatient and mailPatient :D
       filteredAndSortedData: function () {
         let result = this.patients
         this.searchQuery = this.searchQuery.toLowerCase()
         if (this.searchQuery) {
           let halfSorted = result.filter(item => item.nomPatient.toLowerCase().includes(this.searchQuery))
-          // Copy both results arrays and remove duplicates
-          result = [...new Set([...halfSorted, ...result.filter(item => item.prenomPatient.toLowerCase().includes(this.searchQuery))])]
+          let halfSortedMail = result.filter(item => item.mailPatient.toLowerCase().includes(this.searchQuery))
+          let halfSortedPrenom = result.filter(item => item.prenomPatient.toLowerCase().includes(this.searchQuery))
+          // Copy all the results arrays and remove duplicates
+          result = [...new Set([...halfSorted, ...halfSortedPrenom, ...halfSortedMail])]
         }
 
         let ascDesc = this.sortAsc ? 1 : -1

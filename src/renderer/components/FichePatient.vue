@@ -361,6 +361,7 @@
           })
         this.$data.antecedantIsHere = false
         this.$data.antecedants = []
+        this.$data.ajoutAntecedant = false
       }
     },
     validations: {
