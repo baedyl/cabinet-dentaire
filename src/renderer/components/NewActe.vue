@@ -1,26 +1,26 @@
 <template>
   <div class="content">
     <router-link :to="{ name: 'fiche-consultation', query: { id: { 'idConsultation': this.$data.idConsultation } } }">
-      <img class="left-arrow" src="../assets/back.png"/>
+      <img class="icon left-arrow" src="../assets/back.png"/>
     </router-link>
     <br>
     <br>
     <br>
-    <h3>
+    <h2>
       <button class="btn" id="show-modal" @click="showModal = true">Observation</button>
-    </h3>
+    </h2>
+    <br>
     <Modal v-if="showModal" @close="showModal = false">
       <!--
         you can use custom content here to overwrite
         default content
       -->
-        <div>
-          <!-- Illustration des dents -->
-          <Machoire/>
+      <h6 slot="header">
+        <!-- Illustration des dents -->
+        <div class="">
+          <img src="../assets/dents.png"/>
         </div>
-      <h3 slot="header">
-
-      </h3>
+      </h6>
     </Modal>
     <form>
       <div class="form-group" :class="{ 'form-group--error': $v.form.libelle.$error }">
@@ -63,7 +63,7 @@
   import required from 'vuelidate/lib/validators/required'
   import numeric from 'vuelidate/lib/validators/numeric'
 
-  import Machoire from './Machoire'
+  // import Machoire from './Machoire'
   import Modal from './Modal'
 
   const db = require('../database.js')
@@ -72,7 +72,7 @@
   export default {
     name: 'add-acte',
     components: {
-      Machoire,
+      // Machoire,
       Modal
     },
     data () {
@@ -121,5 +121,6 @@
   }
 </script>
 
-<style>
+<style scoped>
+
 </style>

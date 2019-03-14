@@ -1,7 +1,7 @@
 <template>
   <div class="content">
     <router-link :to="{ name: 'fiche-consultation', query: { id: { 'idConsultation': $data.idConsultation }}}">
-      <img class="left-arrow" src="../assets/back.png"/>
+      <img class="icon left-arrow" src="../assets/back.png"/>
     </router-link>
     <br>
     <br>

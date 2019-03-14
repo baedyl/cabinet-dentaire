@@ -133,7 +133,7 @@
       <br>
       <button class="btn">
         <h2>
-          <router-link :to="{ name: 'add-consultation', query: { infos: { 'idPatient': this.$data.form.id } } }">New Consultation</router-link>
+          <router-link class="btn" :to="{ name: 'add-consultation', query: { infos: { 'idPatient': this.$data.form.id } } }">New Consultation</router-link>
         </h2>
       </button>
     </fieldset>
@@ -419,10 +419,6 @@
   }
   .left-arrow {
     top: 0px;
-  }
-  .refresh {
-    top: 0px;
-    left: 300px;
   }
 
   .container {

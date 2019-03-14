@@ -1,12 +1,12 @@
 <template>
   <div class="content">
     <router-link :to="{ name: 'fiche-patient', query: { infos: { 'id': form.idPatient }}}">
-      <img class="left-arrow" src="../assets/back.png"/>
+      <img class="icon left-arrow" src="../assets/back.png"/>
     </router-link>
     <br>
     <br>
     <br>
-    <form>
+    <form class="edit-form">
       <div class="form-group" :class="{ 'form-group--error': $v.form.dateConsultation.$error }">
         <label class="form__label">Date Consultation</label>
         <input class="form__input" v-model.trim="$v.form.dateConsultation.$model" type="date"/>

@@ -7,6 +7,7 @@
         <input class="form__input" v-model.trim="$v.form.dateRdv.$model" type="datetime-local" @change="verifyDate"/>
       </div>
       <div class="error" v-if="!$v.form.dateRdv.required">Le champ date et heure est obligatoire!</div>
+      <div class="error" v-if="!$v.form.dateRdv.minValue">La date doit etre >= a la date du jour!</div>
 
       <div class="form-group">
         <label class="form__label">Patient</label>
@@ -33,7 +34,7 @@
         <input class="form__input" v-model="$data.form.note"/>
       </div>
 
-      <h2><button type="submit" class="btn" v-on:click="newRdv">{{ title }}</button></h2>
+      <h2><button type="submit" class="btn" v-on:click="newRdv" v-if="$v.form.dateRdv.minValue" diabled>{{ title }}</button></h2>
       <div v-if="envoyerMail">
         {{ sendMail() }}
       </div>
@@ -45,7 +46,7 @@
 
 <script>
   import required from 'vuelidate/lib/validators/required'
-  // import numeric from 'vuelidate/lib/validators/numeric'
+  import minValue from 'vuelidate/lib/validators/minValue'
   import * as emailjs from 'emailjs-com'
 
   const db = require('../database.js')
@@ -185,7 +186,8 @@
     validations: {
       form: {
         dateRdv: {
-          required
+          required,
+          minValue: minValue(new Date())
         }
       }
     }

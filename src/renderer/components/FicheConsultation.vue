@@ -1,7 +1,7 @@
 <template>
   <div class="content">
     <router-link :to="{ name: 'fiche-patient', query: { infos: { 'id': form.idPatient }}}">
-      <img class="left-arrow" src="../assets/back.png"/>
+      <img class="icon left-arrow" src="../assets/back.png"/>
     </router-link>
     <br>
     <br>
@@ -61,7 +61,7 @@
       </table>
       <br>
       <button class="btn">
-      <h2><router-link :to="{ name: 'add-acte', params: { id: this.$data.idConsultation } }">New Acte</router-link></h2>
+      <h2><router-link class="btn" :to="{ name: 'add-acte', params: { id: this.$data.idConsultation } }">New Acte</router-link></h2>
       </button>
       <!--<router-link :to="{ name: 'add-acte', query: { id: { 'idConsultation': this.$data.idConsultation } } }">New Acte</router-link>-->
     </fieldset>

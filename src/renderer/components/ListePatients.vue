@@ -5,7 +5,7 @@
     </div>
     <div>{{ filteredAndSortedData }}</div>
     <form id="search">
-      Search <input name="query" v-model="searchQuery" placeholder="Rechercher un patient">
+      <input name="query" v-model="searchQuery" placeholder="Rechercher un patient">
     </form>
     <table>
       <thead>
