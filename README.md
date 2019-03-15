@@ -1,6 +1,6 @@
 # pfa_final
 
-> An electron-vue project
+> An electron-vue project, dental cabinet management
 
 #### Build Setup
 
